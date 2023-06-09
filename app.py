@@ -1,7 +1,17 @@
 from flask import Flask, request
+
+import sys
 import json
+
+sys.path.append("config")
+sys.path.append("controller")
+from config import firebase_config
+from controller import auth_controller
+
 app = Flask(__name__)
 base_url = '/api/v1'
+
+firebase_config_object = None
 
 
 # GET: return Response Data (JSON/HTML/XML)
@@ -19,7 +29,7 @@ def hello_world():  # put application's code here
 def signin():
     # using request(object) to get the hidden data which is imported from flask
     request_body = json.loads(request.data)
-    print(request_body)
+    auth_controller.sign_in(firebase_config_object, request_body['email'], request_body['password_hash'])
     return 'successfully done!'
 
 
@@ -32,5 +42,10 @@ def signup():
     return 'signup'
 
 
+def initializer():
+    firebase_config_object = firebase_config.FirebaseConfig()
+
+
 if __name__ == '__main__':
+    initializer()
     app.run()
