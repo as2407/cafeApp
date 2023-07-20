@@ -1,5 +1,9 @@
 from decouple import config
 import pyrebase
+from sqlalchemy import *
+from sqlalchemy.orm import *
+
+from models import Base
 
 
 class FirebaseConfig:
@@ -21,10 +25,21 @@ class FirebaseConfig:
 
             # initializing the app
             self.firebase = pyrebase.initialize_app(firebase_config)
-            return self.firebase
-        else:
-            return self.firebase
+        return self.firebase
 
 
+class DatabaseConfig:
+    def __init__(self):
+        self.session = None
 
-# obj = FirebaseConfig()
+    def get_session(self):
+        if self.session is None:
+            _engine = create_engine("postgresql+psycopg2://ankitasamanta:0342@localhost:5433/summer_project")
+            Base.metadata.create_all(bind=_engine)
+            self.session = Session(_engine)
+
+        return self.session
+
+
+firebase_config_object = FirebaseConfig()
+database_config_object = DatabaseConfig()
